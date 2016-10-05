@@ -26,9 +26,17 @@ int main(int argc, char** argv) {
 	imshow("My Window", image);
 
         Mat imgHSV;
+	Mat imgGray;
+	Mat imgYCbCr;
+
         cvtColor(image, imgHSV, COLOR_BGR2HSV);
+	cvtColor(image, imgGray, COLOR_BGR2GRAY);
+	cvtColor(image, imgYCbCr, COLOR_BGR2YCrCb);
 
         imshow("HSVimg", imgHSV);
+	imshow("Grayimg", imgGray);
+	imshow("~Grayimg", ~imgGray);
+	imshow("YCbCrimg", imgYCbCr);
 
         int iLowH = 0;
         int iHighH = 179;
