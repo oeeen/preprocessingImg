@@ -94,7 +94,20 @@ int main()
   // 높은 봉우리(명암값 60) 방향으로 증가하기 직전인 최소값으로 정함.
  cv::namedWindow("Binary Image"); // 경계화된 영상 띄워 보기
  cv::imshow("Binary Image",thresholded); // 배경과 전경이 분할됨
+ 
+ cv::Mat eroded;
+ 
+ cv::Mat dilated;
+
+ cv::dilate(thresholded, dilated, cv::Mat());
+ cv::erode(dilated, eroded, cv::Mat());
+ imwrite("./dilerod.jpg", eroded);
+ 
+ cv::erode(thresholded, eroded, cv::Mat());
+ cv::dilate(thresholded, dilated, cv::Mat());
+ imwrite("./eroddila.jpg", dilated);
  imwrite("./thresholded.jpg", thresholded);
+
  cv::waitKey(0);
 
  return 0;
