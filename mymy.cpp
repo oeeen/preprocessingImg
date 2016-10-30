@@ -37,6 +37,7 @@ int main(int argc, char** argv) {
 	imshow("Grayimg", imgGray);
 	imshow("~Grayimg", ~imgGray);
 	imshow("YCbCrimg", imgYCbCr);
+	imwrite("./out.jpg", ~imgGray);
 
         int iLowH = 0;
         int iHighH = 179;
