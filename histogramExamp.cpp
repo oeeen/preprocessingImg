@@ -63,9 +63,30 @@ public :
  }
 };
 
+cv::Mat removeNoise(cv::Mat origin) {
+   cv::Mat result(50,198,CV_8U);
+   for(int i = 0; i<198; i++) {
+      for(int j = 0; j<50; j++) {
+         result.at<uchar>(j, i)=origin.at<uchar>(j, i);
+      }
+   }
+   for(int i = 1; i<197; i++) {
+      for(int j = 1; j<49; j++) {
+         if(origin.at<uchar>(j, i)==255) {
+            if(origin.at<uchar>(j-1, i)==0 || origin.at<uchar>(j+1, i)==0 || origin.at<uchar>(j, i-1)==0 || origin.at<uchar>(j, i+1)==0) {
+               result.at<uchar>(j,i)=0;
+            } else {
+               result.at<uchar>(j,i)=255;
+            }
+         }
+      }
+   }
+   std::cout<<"End!";
+   return result;
+}
 char calcPixel(cv::Mat crop) {
    char result='A';
-   int cnt;
+   int cnt=0;
    
    for(int i = 0; i<22; i++) {
       for(int j = 0; j<40; j++) {
@@ -111,39 +132,43 @@ int main()
  cv::namedWindow("Binary Image"); // 경계화된 영상 띄워 보기
  cv::imshow("Binary Image",thresholded); // 배경과 전경이 분할됨
  imwrite("./thresholded.jpg", thresholded);
-
+ cv::Mat tmpd;
+ cv::dilate(thresholded, tmpd, cv::Mat());
+ cv::Mat proImg = removeNoise(thresholded);
+ //proImg = removeNoise(proImg);
+ cv::imshow("processed image", proImg);
  cv::Mat eroded;
  cv::Mat dilated;
  
  char tmp; // 해당 문자 임시 저장
  char result[5];
 
- cv::Rect myROI(25, 6, 22, 40);
+ cv::Rect myROI(35, 8, 30, 33);
  cv::Mat croppedImg = thresholded(myROI);
  imwrite("./1st.jpg", croppedImg);
  tmp = calcPixel(croppedImg);
  result[0] = tmp;
  
  
- cv::Rect secROI(48, 13, 22, 40);
+ cv::Rect secROI(65, 16, 30, 33);
  croppedImg = thresholded(secROI);
  imwrite("./2nd.jpg", croppedImg);
  tmp = calcPixel(croppedImg);
  result[1] = tmp;
  
- cv::Rect thiROI(72, 6, 22, 40);
+ cv::Rect thiROI(95, 8, 30, 33);
  croppedImg = thresholded(thiROI);
  imwrite("./3rd.jpg", croppedImg);
  tmp = calcPixel(croppedImg);
  result[2] = tmp;
  
- cv::Rect forROI(96, 13, 22, 40);
+ cv::Rect forROI(125, 16, 30, 33);
  croppedImg = thresholded(forROI);
  imwrite("./4th.jpg", croppedImg);
  tmp = calcPixel(croppedImg);
  result[3] = tmp;
  
- cv::Rect fifROI(120, 13, 22, 40);
+ cv::Rect fifROI(155, 8, 30, 33);
  croppedImg = thresholded(fifROI);
  imwrite("./5th.jpg", croppedImg);
  tmp = calcPixel(croppedImg);
