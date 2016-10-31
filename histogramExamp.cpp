@@ -63,6 +63,22 @@ public :
  }
 };
 
+char calcPixel(cv::Mat crop) {
+   char result='A';
+   int cnt;
+   
+   for(int i = 0; i<22; i++) {
+      for(int j = 0; j<40; j++) {
+         if(crop.at<uchar>(i, j)==255) cnt++;
+      }
+   }
+   if(cnt>=200 && cnt<=270) result='G';
+   else if(cnt>=380 && cnt<=400) result='D';
+   else if(cnt>=350 && cnt<=370) result='B';
+   else if(cnt>=120 && cnt<=140) result='U';
+   return result;
+}
+
 int main()
 {
  cv::Mat image = cv::imread("out.jpg", 0);
@@ -89,16 +105,50 @@ int main()
  
  // 영상을 두 그룹으로 나누는 부분을 경계값으로 처리해 확인
  cv::Mat thresholded; // 경계값으로 이진 영상 생성
- cv::threshold(image,thresholded,100,255,cv::THRESH_BINARY);
+ cv::threshold(image,thresholded,50,255,cv::THRESH_BINARY);
   // 영상을 경계화 하기 위해 히스토그램의 
   // 높은 봉우리(명암값 60) 방향으로 증가하기 직전인 최소값으로 정함.
  cv::namedWindow("Binary Image"); // 경계화된 영상 띄워 보기
  cv::imshow("Binary Image",thresholded); // 배경과 전경이 분할됨
- 
- cv::Mat eroded;
- 
- cv::Mat dilated;
+ imwrite("./thresholded.jpg", thresholded);
 
+ cv::Mat eroded;
+ cv::Mat dilated;
+ 
+ char tmp; // 해당 문자 임시 저장
+ char result[5];
+
+ cv::Rect myROI(25, 6, 22, 40);
+ cv::Mat croppedImg = thresholded(myROI);
+ imwrite("./1st.jpg", croppedImg);
+ tmp = calcPixel(croppedImg);
+ result[0] = tmp;
+ 
+ 
+ cv::Rect secROI(48, 13, 22, 40);
+ croppedImg = thresholded(secROI);
+ imwrite("./2nd.jpg", croppedImg);
+ tmp = calcPixel(croppedImg);
+ result[1] = tmp;
+ 
+ cv::Rect thiROI(72, 6, 22, 40);
+ croppedImg = thresholded(thiROI);
+ imwrite("./3rd.jpg", croppedImg);
+ tmp = calcPixel(croppedImg);
+ result[2] = tmp;
+ 
+ cv::Rect forROI(96, 13, 22, 40);
+ croppedImg = thresholded(forROI);
+ imwrite("./4th.jpg", croppedImg);
+ tmp = calcPixel(croppedImg);
+ result[3] = tmp;
+ 
+ cv::Rect fifROI(120, 13, 22, 40);
+ croppedImg = thresholded(fifROI);
+ imwrite("./5th.jpg", croppedImg);
+ tmp = calcPixel(croppedImg);
+ result[4] = tmp;
+ 
  cv::dilate(thresholded, dilated, cv::Mat());
  cv::erode(dilated, eroded, cv::Mat());
  imwrite("./dilerod.jpg", eroded);
@@ -106,9 +156,10 @@ int main()
  cv::erode(thresholded, eroded, cv::Mat());
  cv::dilate(thresholded, dilated, cv::Mat());
  imwrite("./eroddila.jpg", dilated);
- imwrite("./thresholded.jpg", thresholded);
-
+ 
  cv::waitKey(0);
+ 
+ std::cout<<result<<std::endl;
 
  return 0;
 }
