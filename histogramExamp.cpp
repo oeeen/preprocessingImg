@@ -73,7 +73,18 @@ cv::Mat removeNoise(cv::Mat origin) {
    for(int i = 1; i<197; i++) {
       for(int j = 1; j<49; j++) {
          if(origin.at<uchar>(j, i)==255) {
-            if(origin.at<uchar>(j-1, i)==0 || origin.at<uchar>(j+1, i)==0 || origin.at<uchar>(j, i-1)==0 || origin.at<uchar>(j, i+1)==0) {
+            if(origin.at<uchar>(j-1, i)==0 || origin.at<uchar>(j+1, i)==0 || (origin.at<uchar>(j, i+1)==0 && origin.at<uchar>(j, i-1)) ) {
+               result.at<uchar>(j,i)=0;
+            } else {
+               result.at<uchar>(j,i)=255;
+            }
+         }
+      }
+   }
+   for(int i = 1; i<197; i++) {
+      for(int j = 1; j<49; j++) {
+         if(result.at<uchar>(j, i)==255) {
+            if(result.at<uchar>(j-1, i)==0 &&result.at<uchar>(j+1, i)==0 && (result.at<uchar>(j, i+1)==0 && result.at<uchar>(j, i-1)) ) {
                result.at<uchar>(j,i)=0;
             } else {
                result.at<uchar>(j,i)=255;
@@ -93,8 +104,9 @@ char calcPixel(cv::Mat crop) {
          if(crop.at<uchar>(i, j)==255) cnt++;
       }
    }
+   std::cout << cnt <<std::endl;
    if(cnt>=200 && cnt<=270) result='G';
-   else if(cnt>=380 && cnt<=400) result='D';
+   else if(cnt>=350 && cnt<=360) result='D';
    else if(cnt>=350 && cnt<=370) result='B';
    else if(cnt>=120 && cnt<=140) result='U';
    return result;
@@ -133,10 +145,15 @@ int main()
  cv::imshow("Binary Image",thresholded); // 배경과 전경이 분할됨
  imwrite("./thresholded.jpg", thresholded);
  cv::Mat tmpd;
- cv::dilate(thresholded, tmpd, cv::Mat());
  cv::Mat proImg = removeNoise(thresholded);
  //proImg = removeNoise(proImg);
+ cv::dilate(proImg, tmpd, cv::Mat());
+ //cv::dilate(tmpd, tmpd, cv::Mat());
+ //cv::erode(tmpd, tmpd, cv::Mat());
  cv::imshow("processed image", proImg);
+ cv::imshow("dilated image", tmpd);
+ imwrite("./processed.jpg", proImg);
+ imwrite("./dilated.jpg", tmpd);
  cv::Mat eroded;
  cv::Mat dilated;
  
