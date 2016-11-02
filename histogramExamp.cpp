@@ -3,6 +3,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+int window[10][2];
 // 멤버 변수 정의
 class Histogram1D {
 private:
@@ -63,6 +64,49 @@ public :
  }
 };
 
+cv::Mat rmNoise(cv::Mat origin) {
+   cv::Mat result(50, 198, CV_8U);
+   int cnt=0;
+   int k=0;
+   int flag=0;
+   int tmp=-1;
+   for(int i = 0; i<198; i++) {
+      for(int j = 0; j<50; j++) {
+         result.at<uchar>(j, i)=origin.at<uchar>(j, i);
+      }
+   }
+   for(int i = 0; i<198; i++) {
+      for(int j = 0; j<50; j++) {
+         if(origin.at<uchar>(j, i)==255 && tmp==-1) {
+            tmp=j;
+            cnt++;
+         } else if(origin.at<uchar>(j, i)==255 && tmp!=-1) {
+            cnt++;
+         }
+      }
+      if(cnt<=4) {
+         if(flag==1) {
+            flag=0;
+         }
+         for(int j = 0; j<50; j++) {
+            if(origin.at<uchar>(j, i)==255) result.at<uchar>(j, i)=0;
+         }
+      } else {
+         if(flag==0) {
+            window[k][0] = i;
+            window[k][1] = tmp;
+            for(int j = 0; j<50; j++) {
+               result.at<uchar>(j, i)=255;
+            }
+            flag=1;
+            std::cout<<i<<std::endl;
+         }
+      }
+      cnt=0;
+   }
+   return result;
+}
+
 cv::Mat removeNoise(cv::Mat origin) {
    cv::Mat result(50,198,CV_8U);
    for(int i = 0; i<198; i++) {
@@ -104,7 +148,6 @@ char calcPixel(cv::Mat crop) {
          if(crop.at<uchar>(i, j)==255) cnt++;
       }
    }
-   std::cout << cnt <<std::endl;
    if(cnt>=200 && cnt<=270) result='G';
    else if(cnt>=350 && cnt<=360) result='D';
    else if(cnt>=350 && cnt<=370) result='B';
@@ -146,11 +189,13 @@ int main()
  imwrite("./thresholded.jpg", thresholded);
  cv::Mat tmpd;
  cv::Mat proImg = removeNoise(thresholded);
+ cv::Mat newImg = rmNoise(thresholded);
  //proImg = removeNoise(proImg);
  cv::dilate(proImg, tmpd, cv::Mat());
  //cv::dilate(tmpd, tmpd, cv::Mat());
  //cv::erode(tmpd, tmpd, cv::Mat());
  cv::imshow("processed image", proImg);
+ cv::imshow("new version", newImg);
  cv::imshow("dilated image", tmpd);
  imwrite("./processed.jpg", proImg);
  imwrite("./dilated.jpg", tmpd);
