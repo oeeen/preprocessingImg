@@ -12,6 +12,7 @@ double fileIdx;
 
 void calcX(cv::Mat origin) {
 	int cnt = 0;
+	int cnt2;
 	int idxX = 0;
 	int flag = 0;
 	for (int i = 40; i<198; i++) {
@@ -29,26 +30,41 @@ void calcX(cv::Mat origin) {
 			if (cnt == 0) {
 				for (int j = 0; j<50; j++) {
 					if (origin.at<uchar>(j, i + 2) == 255) cnt++;
-
 				}
+
 				if (cnt == 0) {
 					for (int j = 0; j<50; j++) {
 						if (origin.at<uchar>(j, i + 3) == 255) cnt++;
 					}
 					if (cnt == 0) {
-						for (int j = 0; j<50; j++) {
-							if (origin.at<uchar>(j, i + 4) == 255) cnt++;
+						flag = 0;
+						windowX[idxX][1] = i;
+						if (windowX[idxX][1] - windowX[idxX][0] >= 33) {
+							for (int k = windowX[idxX][0] + 7; k < windowX[idxX][1]; k++) {
+								cnt2 = 0;
+								for (int j = 0; j<50; j++) {
+									if (origin.at<uchar>(j, k) == 255 && origin.at<uchar>(j, k + 1) == 255) cnt2++;
+								}
+								if (cnt2 == 0) {
+
+									std::cout << windowX[idxX][0] << " " << k << " " << windowX[idxX][1] << std::endl;
+									windowX[idxX + 1][1] = windowX[idxX][1];
+									windowX[idxX][1] = k + 1;
+									idxX++;
+									windowX[idxX][0] = k + 2;
+									k += 7;
+									if (windowX[idxX][1] - windowX[idxX][0] < 35)
+										break;
+								}
+							}
 						}
-						if (cnt == 0) {
-							flag = 0;
-							windowX[idxX][1] = i;
-							idxX++;
-						}
+						idxX++;
 					}
 				}
 			}
 		}
 		cnt = 0;
+		if (idxX > 4) break;
 	}
 	for (int i = 0; i<5; i++) {
 		std::cout << windowX[i][0] << " " << windowX[i][1] << std::endl;
@@ -56,8 +72,8 @@ void calcX(cv::Mat origin) {
 }
 void calcY(cv::Mat origin) {
 	for (int i = 0; i < 5; i++) {
-		windowY[i][0] = 0;
-		windowY[i][1] = 50;
+		windowY[i][0] = 7;
+		windowY[i][1] = 47;
 	}
 
 	for (int i = 0; i<5; i++) {
@@ -103,166 +119,146 @@ for(int i = 0; i<5; i++) {
 std::cout<<windowY[i][0]<<" "<<windowY[i][1]<<std::endl;
 }
 }*/
-
+/*
 cv::Mat rmLine(cv::Mat origin) {
-	cv::Mat result(50, 198, CV_8U);
-	int startx = 0, starty = 0;
-	int cond = 0; // 1 대각선 위, 0 옆으로, -1 대각선 아래
+cv::Mat result(50, 198, CV_8U);
+int startx=0, starty=0;
+int cond=0; // 1 대각선 위, 0 옆으로, -1 대각선 아래
 
-	for (int i = 0; i<198; i++) {
-		for (int j = 0; j<50; j++) {
-			result.at<uchar>(j, i) = origin.at<uchar>(j, i);
-		}
-	}
-
-	cv::imshow("ABCDEF", origin);
-
-	for (int i = 0; i<198; i++) {
-		for (int j = 0; j<50; j++) {
-			if (origin.at<uchar>(j, i) == 255) {
-				startx = i;
-				starty = j;
-				std::cout << "start x: " << startx << " starty: " << starty << std::endl;
-				break;
-			}
-		}
-		if (startx != 0) break;
-	}
-	std::cout << (int)result.at<uchar>(19, 19) << std::endl;
-	int presx = startx;
-	int presy = starty;
-	int flag = 0;
-	for (int i = startx; i<198; i++) {
-		presx = i;
-		flag = 0;
-		int tmpy = presy;
-		if (cond == 1) {
-			if (origin.at<uchar>(tmpy - 1, presx) == 255) flag++;
-			if (origin.at<uchar>(tmpy, presx) == 255) flag++;
-			if (origin.at<uchar>(tmpy + 1, presx) == 255) flag++;
-			//         std::cout<<"condition: " << cond <<std::endl;
-
-			if (flag == 0) {
-				//          std::cout<<"flag is zero!"<<std::endl;
-			}
-			else if (flag == 1) {
-				if (origin.at<uchar>(tmpy - 1, presx) == 255) {
-					presy--;
-					cond = 1;
-					result.at<uchar>(presy, presx) = 0;
-				}
-				else if (origin.at<uchar>(tmpy + 1, presx) == 255) {
-					presy++;
-					cond = -1;
-					result.at<uchar>(presy, presx) = 0;
-				}
-				else if (origin.at<uchar>(tmpy, presx) == 255) {
-					cond = 0;
-					result.at<uchar>(presy, presx) = 0;
-				}
-			}
-			else if (flag>2) {
-				cond = 0;
-			}
-			else if (flag == 2) {
-				if (origin.at<uchar>(tmpy - 1, presx) == 255) {
-					origin.at<uchar>(tmpy - 1, presx) == 0;
-					presy--;
-					cond = 1;
-				}
-				else {
-					cond = 0;
-				}
-				if (origin.at<uchar>(tmpy, presx) == 255) origin.at<uchar>(tmpy, presx) == 0;
-				if (origin.at<uchar>(tmpy + 1, presx) == 255) origin.at<uchar>(tmpy + 1, presx) == 0;
-			}
-		}
-		else if (cond == 0) {
-			if (origin.at<uchar>(tmpy - 1, presx) == 255) flag++;
-			if (origin.at<uchar>(tmpy, presx) == 255) flag++;
-			if (origin.at<uchar>(tmpy + 1, presx) == 255) flag++;
-			//         std::cout<<"condition: " << cond <<std::endl;
-			//         std::cout<<"flag: " << flag <<std::endl;
-			if (flag == 0) {
-				//           std::cout<<"flag is zero!"<<std::endl;
-			}
-			else if (flag == 1) {
-				if (origin.at<uchar>(tmpy - 1, presx) == 255) {
-					presy--;
-					cond = 1;
-					result.at<uchar>(presy, presx) = 0;
-				}
-				else if (origin.at<uchar>(tmpy + 1, presx) == 255) {
-					presy++;
-					cond = -1;
-					result.at<uchar>(presy, presx) = 0;
-				}
-				else if (origin.at<uchar>(tmpy, presx) == 255) {
-					cond = 0;
-					result.at<uchar>(presy, presx) = 0;
-				}
-			}
-			else if (flag>2) {
-				cond = 0;
-			}
-			else if (flag == 2) {
-				if (origin.at<uchar>(tmpy - 1, presx) == 255) {
-					origin.at<uchar>(tmpy - 1, presx) == 0;
-					presy--;
-					cond = 1;
-				}
-				else {
-					cond = 0;
-				}
-				if (origin.at<uchar>(tmpy, presx) == 255) origin.at<uchar>(tmpy, presx) == 0;
-				if (origin.at<uchar>(tmpy + 1, presx) == 255) origin.at<uchar>(tmpy + 1, presx) == 0;
-			}
-		}
-		else if (cond == -1) {
-			if (origin.at<uchar>(tmpy - 1, presx) == 255) flag++;
-			if (origin.at<uchar>(tmpy, presx) == 255) flag++;
-			if (origin.at<uchar>(tmpy + 1, presx) == 255) flag++;
-			//         std::cout<<"condition: " << cond <<std::endl;
-
-			if (flag == 0) {
-				//           std::cout<<"flag is zero!"<<std::endl;
-			}
-			else if (flag == 1) {
-				if (origin.at<uchar>(tmpy - 1, presx) == 255) {
-					presy--;
-					cond = 1;
-					result.at<uchar>(presy, presx) = 0;
-				}
-				else if (origin.at<uchar>(tmpy + 1, presx) == 255) {
-					presy++;
-					cond = -1;
-					result.at<uchar>(presy, presx) = 0;
-				}
-				else if (origin.at<uchar>(tmpy, presx) == 255) {
-					cond = 0;
-					result.at<uchar>(presy, presx) = 0;
-				}
-			}
-			else if (flag>2) {
-				cond = 0;
-			}
-			else if (flag == 2) {
-				if (origin.at<uchar>(tmpy - 1, presx) == 255) {
-					origin.at<uchar>(tmpy - 1, presx) == 0;
-					presy--;
-					cond = 1;
-				}
-				else {
-					cond = 0;
-				}
-				if (origin.at<uchar>(tmpy, presx) == 255) origin.at<uchar>(tmpy, presx) == 0;
-				if (origin.at<uchar>(tmpy + 1, presx) == 255) origin.at<uchar>(tmpy + 1, presx) == 0;
-			}
-		}
-	}
-
-	return result;
+for(int i = 0; i<198; i++) {
+for(int j = 0; j<50; j++) {
+result.at<uchar>(j, i)=origin.at<uchar>(j, i);
 }
+}
+
+cv::imshow("ABCDEF", origin);
+
+for(int i = 0; i<198; i++) {
+for(int j = 0; j<50; j++) {
+if(origin.at<uchar>(j, i)==255) {
+startx=i;
+starty=j;
+std::cout<<"start x: "<<startx <<" starty: "<<starty<<std::endl;
+break;
+}
+}
+if(startx!=0) break;
+}
+std::cout<<(int)result.at<uchar>(19,19)<<std::endl;
+int presx=startx;
+int presy=starty;
+int flag=0;
+for(int i = startx; i<198; i++) {
+presx=i;
+flag=0;
+int tmpy=presy;
+if(cond==1) {
+if(origin.at<uchar>(tmpy-1, presx)==255) flag++;
+if(origin.at<uchar>(tmpy, presx)==255) flag++;
+if(origin.at<uchar>(tmpy+1, presx)==255) flag++;
+//         std::cout<<"condition: " << cond <<std::endl;
+
+if(flag==0) {
+//          std::cout<<"flag is zero!"<<std::endl;
+} else if(flag==1){
+if(origin.at<uchar>(tmpy-1, presx)==255) {
+presy--;
+cond=1;
+result.at<uchar>(presy,presx)=0;
+} else if(origin.at<uchar>(tmpy+1, presx)==255) {
+presy++;
+cond=-1;
+result.at<uchar>(presy,presx)=0;
+} else if(origin.at<uchar>(tmpy, presx)==255) {
+cond=0;
+result.at<uchar>(presy,presx)=0;
+}
+} else if(flag>2) {
+cond=0;
+} else if(flag==2) {
+if(origin.at<uchar>(tmpy-1, presx)==255) {
+origin.at<uchar>(tmpy-1, presx)==0;
+presy--;
+cond=1;
+} else {
+cond=0;
+}
+if(origin.at<uchar>(tmpy, presx)==255) origin.at<uchar>(tmpy, presx)==0;
+if(origin.at<uchar>(tmpy+1, presx)==255) origin.at<uchar>(tmpy+1, presx)==0;
+}
+} else if(cond==0) {
+if(origin.at<uchar>(tmpy-1, presx)==255) flag++;
+if(origin.at<uchar>(tmpy, presx)==255) flag++;
+if(origin.at<uchar>(tmpy+1, presx)==255) flag++;
+//         std::cout<<"condition: " << cond <<std::endl;
+//         std::cout<<"flag: " << flag <<std::endl;
+if(flag==0) {
+//           std::cout<<"flag is zero!"<<std::endl;
+} else if(flag==1) {
+if(origin.at<uchar>(tmpy-1, presx)==255) {
+presy--;
+cond=1;
+result.at<uchar>(presy,presx)=0;
+} else if(origin.at<uchar>(tmpy+1, presx)==255) {
+presy++;
+cond=-1;
+result.at<uchar>(presy,presx)=0;
+} else if(origin.at<uchar>(tmpy, presx)==255) {
+cond=0;
+result.at<uchar>(presy,presx)=0;
+}
+} else if(flag>2) {
+cond=0;
+} else if(flag==2) {
+if(origin.at<uchar>(tmpy-1, presx)==255) {
+origin.at<uchar>(tmpy-1, presx)==0;
+presy--;
+cond=1;
+} else {
+cond=0;
+}
+if(origin.at<uchar>(tmpy, presx)==255) origin.at<uchar>(tmpy, presx)==0;
+if(origin.at<uchar>(tmpy+1, presx)==255) origin.at<uchar>(tmpy+1, presx)==0;
+}
+} else if(cond==-1) {
+if(origin.at<uchar>(tmpy-1, presx)==255) flag++;
+if(origin.at<uchar>(tmpy, presx)==255) flag++;
+if(origin.at<uchar>(tmpy+1, presx)==255) flag++;
+//         std::cout<<"condition: " << cond <<std::endl;
+
+if(flag==0) {
+//           std::cout<<"flag is zero!"<<std::endl;
+} else if(flag==1) {
+if(origin.at<uchar>(tmpy-1, presx)==255) {
+presy--;
+cond=1;
+result.at<uchar>(presy,presx)=0;
+} else if(origin.at<uchar>(tmpy+1, presx)==255) {
+presy++;
+cond=-1;
+result.at<uchar>(presy,presx)=0;
+} else if(origin.at<uchar>(tmpy, presx)==255) {
+cond=0;
+result.at<uchar>(presy,presx)=0;
+}
+} else if(flag>2) {
+cond=0;
+} else if(flag==2) {
+if(origin.at<uchar>(tmpy-1, presx)==255) {
+origin.at<uchar>(tmpy-1, presx)==0;
+presy--;
+cond=1;
+} else {
+cond=0;
+}
+if(origin.at<uchar>(tmpy, presx)==255) origin.at<uchar>(tmpy, presx)==0;
+if(origin.at<uchar>(tmpy+1, presx)==255) origin.at<uchar>(tmpy+1, presx)==0;
+}
+}
+}
+
+return result;
+}*/
 
 cv::Mat rmNoise(cv::Mat origin) {
 	cv::Mat result(50, 198, CV_8U);
@@ -295,44 +291,41 @@ cv::Mat rmNoise(cv::Mat origin) {
 		}
 		cnt = 0;
 	}
-	cv::imshow("aaaaa", result);
 	return result;
 }
-
+/*
 cv::Mat removeNoise(cv::Mat origin) {
-	cv::Mat result(50, 198, CV_8U);
-	for (int i = 0; i<198; i++) {
-		for (int j = 0; j<50; j++) {
-			result.at<uchar>(j, i) = origin.at<uchar>(j, i);
-		}
-	}
-	for (int i = 1; i<197; i++) {
-		for (int j = 1; j<49; j++) {
-			if (origin.at<uchar>(j, i) == 255) {
-				if (origin.at<uchar>(j - 1, i) == 0 || origin.at<uchar>(j + 1, i) == 0 || (origin.at<uchar>(j, i + 1) == 0 && origin.at<uchar>(j, i - 1))) {
-					result.at<uchar>(j, i) = 0;
-				}
-				else {
-					result.at<uchar>(j, i) = 255;
-				}
-			}
-		}
-	}
-	for (int i = 1; i<197; i++) {
-		for (int j = 1; j<49; j++) {
-			if (result.at<uchar>(j, i) == 255) {
-				if (result.at<uchar>(j - 1, i) == 0 && result.at<uchar>(j + 1, i) == 0 && (result.at<uchar>(j, i + 1) == 0 && result.at<uchar>(j, i - 1))) {
-					result.at<uchar>(j, i) = 0;
-				}
-				else {
-					result.at<uchar>(j, i) = 255;
-				}
-			}
-		}
-	}
-	return result;
+cv::Mat result(50,198,CV_8U);
+for(int i = 0; i<198; i++) {
+for(int j = 0; j<50; j++) {
+result.at<uchar>(j, i)=origin.at<uchar>(j, i);
 }
-
+}
+for(int i = 1; i<197; i++) {
+for(int j = 1; j<49; j++) {
+if(origin.at<uchar>(j, i)==255) {
+if(origin.at<uchar>(j-1, i)==0 || origin.at<uchar>(j+1, i)==0 || (origin.at<uchar>(j, i+1)==0 && origin.at<uchar>(j, i-1)) ) {
+result.at<uchar>(j,i)=0;
+} else {
+result.at<uchar>(j,i)=255;
+}
+}
+}
+}
+for(int i = 1; i<197; i++) {
+for(int j = 1; j<49; j++) {
+if(result.at<uchar>(j, i)==255) {
+if(result.at<uchar>(j-1, i)==0 &&result.at<uchar>(j+1, i)==0 && (result.at<uchar>(j, i+1)==0 && result.at<uchar>(j, i-1)) ) {
+result.at<uchar>(j,i)=0;
+} else {
+result.at<uchar>(j,i)=255;
+}
+}
+}
+}
+return result;
+}
+*/
 int calcPixel(cv::Mat crop, int x, int y) {
 	char result = 'A';
 	int cnt = 0;
@@ -349,12 +342,12 @@ int calcPixel(cv::Mat crop, int x, int y) {
 
 void readImg(cv::Mat image, std::string imgName) {
 	cv::Mat thresholded; // 경계값으로 이진 영상 생성
-	cv::threshold(~image, thresholded, 30, 255, cv::THRESH_BINARY);
+	cv::threshold(~image, thresholded, 1, 255, cv::THRESH_BINARY);
 	/*cv::namedWindow("Binary Image"); // 경계화된 영상 띄워 보기
 	cv::imshow("Binary Image",thresholded); // 배경과 전경이 분할됨
 	imwrite("./thresholded.jpg", thresholded);
 	cv::Mat tmpd;*/
-	cv::Mat proImg = removeNoise(thresholded);
+	//cv::Mat proImg = removeNoise(thresholded);
 	cv::Mat newImg = rmNoise(thresholded);
 	//cv::Mat rmLineImg = rmLine(newImg);
 	//cv::Mat lastImg = rmLine(rmLineImg);
@@ -388,6 +381,7 @@ void readImg(cv::Mat image, std::string imgName) {
 
 	(newImg);
 
+	cv::imshow("aaaaa", newImg);
 	std::ostringstream filename;
 	filename << imgName << 1 << ".jpg";
 	std::cout << "filename: " << filename.str() << std::endl;
@@ -409,7 +403,7 @@ void readImg(cv::Mat image, std::string imgName) {
 	filename3 << imgName << 3 << ".jpg";
 	std::cout << "filename: " << filename3.str() << std::endl;
 	cv::Rect thiROI(windowX[2][0], windowY[2][0], windowX[2][1] - windowX[2][0], windowY[2][1] - windowY[2][0]);
-	croppedImg = thresholded(thiROI);
+	croppedImg = newImg(thiROI);
 	imwrite(filename3.str(), croppedImg);
 	pixel = calcPixel(croppedImg, windowX[2][1] - windowX[2][0], windowY[2][1] - windowY[2][0]);
 
@@ -417,7 +411,7 @@ void readImg(cv::Mat image, std::string imgName) {
 	filename4 << imgName << 4 << ".jpg";
 	std::cout << "filename: " << filename4.str() << std::endl;
 	cv::Rect forROI(windowX[3][0], windowY[3][0], windowX[3][1] - windowX[3][0], windowY[3][1] - windowY[3][0]);
-	croppedImg = thresholded(forROI);
+	croppedImg = newImg(forROI);
 	imwrite(filename4.str(), croppedImg);
 	pixel = calcPixel(croppedImg, windowX[3][1] - windowX[3][0], windowY[3][1] - windowY[3][0]);
 
