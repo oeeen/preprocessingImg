@@ -10,6 +10,7 @@ int windowX[5][2];
 int windowY[5][2];
 double fileIdx;
 cv::Mat first[28];
+cv::Mat second[28];
 
 
 int calcPixel(cv::Mat crop, int x, int y);
@@ -50,7 +51,7 @@ void calcX(cv::Mat origin) {
 								}
 								if (cnt2 == 0) {
 
-									std::cout << windowX[idxX][0] << " " << k << " " << windowX[idxX][1] << std::endl;
+									//std::cout << windowX[idxX][0] << " " << k << " " << windowX[idxX][1] << std::endl;
 									windowX[idxX + 1][1] = windowX[idxX][1];
 									windowX[idxX][1] = k + 1;
 									idxX++;
@@ -70,7 +71,7 @@ void calcX(cv::Mat origin) {
 		if (idxX > 4) break;
 	}
 	for (int i = 0; i<5; i++) {
-		std::cout << windowX[i][0] << " " << windowX[i][1] << std::endl;
+		//std::cout << windowX[i][0] << " " << windowX[i][1] << std::endl;
 	}
 }
 void calcY(cv::Mat origin) {
@@ -80,7 +81,7 @@ void calcY(cv::Mat origin) {
 	}
 
 	for (int i = 0; i<5; i++) {
-		std::cout << windowY[i][0] << " " << windowY[i][1] << std::endl;
+		//std::cout << windowY[i][0] << " " << windowY[i][1] << std::endl;
 	}
 }
 /*void calcY(cv::Mat origin) {
@@ -357,7 +358,35 @@ void readFirst() {
 
 }
 
-char compareImg(cv::Mat croppedImg) {
+void readSecond() {
+   std::string dirName = "/home/seongmo/다운로드/git/2nd/";
+	DIR *dir;
+	dir = opendir(dirName.c_str());
+	std::string imgName;
+	fileIdx = 0;
+	cv::Mat image;
+	int cnt = 0;
+	struct dirent *ent;
+	if (dir != NULL) {
+		while ((ent = readdir(dir)) != NULL) {
+			imgName = ent->d_name;
+			if (imgName == "." || imgName == "..") continue;
+			std::string fullPath(dirName + imgName);
+			std::cout << fullPath << std::endl;
+			second[cnt] = cv::imread(fullPath, 0);
+			cnt++;
+		}
+		closedir(dir);
+	}
+	else {
+		std::cout << "Error!" << std::endl;
+	}
+	if (!image.data)
+		return ;
+
+}
+
+char compareImgSecond(cv::Mat croppedImg) {
    int cols = croppedImg.cols;
    int rows = croppedImg.rows;
    int cnt=0;
@@ -366,10 +395,10 @@ char compareImg(cv::Mat croppedImg) {
    int pixel[28];
    char result='A';
    for(int i=0; i<24; i++) {
-      pixel[i]=calcPixel(first[i], first[i].cols, first[i].rows);
+      pixel[i]=calcPixel(second[i], second[i].cols, second[i].rows);
       for(int j=0; j<cols; j++) {
          for(int k=0; k<rows; k++) {
-            if(first[i].at<uchar>(k, j)==255) {
+            if(second[i].at<uchar>(k, j)==255) {
                if(croppedImg.at<uchar>(k, j)==255) {
                   cnt++;
                }
@@ -378,22 +407,21 @@ char compareImg(cv::Mat croppedImg) {
                }
             }
             if(croppedImg.at<uchar>(k, j)==0) {
-               if(first[i].at<uchar>(k, j)==255) {
+               if(second[i].at<uchar>(k, j)==255) {
                   cnt--;
                }
             }
          }
       }
-      std::cout<<"index: "<<i <<" percent: "<<((float)cnt)/(cols*rows)<<std::endl;
+ //     std::cout<<"index: "<<i <<" percent: "<<((float)cnt)/(cols*rows)<<std::endl;
       if(max<((float)cnt)/(cols*rows) ) {
-
          max=((float)cnt)/(cols*rows);
          maxIdx=i;
       }
       cnt=0;
    }
    std::cout<<"MaxIdx: "<<maxIdx<<std::endl;
-   cv::imshow("answer", first[maxIdx]);
+   cv::imshow("answer2", second[maxIdx]);
    
    switch(maxIdx) {
       case 0: result='G';
@@ -445,7 +473,95 @@ char compareImg(cv::Mat croppedImg) {
       case 23: result='R';
       break;
    }
-   std::cout<<result<<std::endl;
+   return result;
+}
+char compareImg(cv::Mat croppedImg) {
+   int cols = croppedImg.cols;
+   int rows = croppedImg.rows;
+   int cnt=0;
+   float max=0;
+   int maxIdx=100;
+   int pixel[28];
+   char result='A';
+   for(int i=0; i<24; i++) {
+      pixel[i]=calcPixel(first[i], first[i].cols, first[i].rows);
+      for(int j=0; j<cols; j++) {
+         for(int k=0; k<rows; k++) {
+            if(first[i].at<uchar>(k, j)==255) {
+               if(croppedImg.at<uchar>(k, j)==255) {
+                  cnt++;
+               }
+               else {
+                  cnt--;
+               }
+            }
+            if(croppedImg.at<uchar>(k, j)==0) {
+               if(first[i].at<uchar>(k, j)==255) {
+                  cnt--;
+               }
+            }
+         }
+      }
+      if(max<((float)cnt)/(cols*rows) ) {
+
+         max=((float)cnt)/(cols*rows);
+         maxIdx=i;
+      }
+      cnt=0;
+   }
+
+   
+   switch(maxIdx) {
+      case 0: result='G';
+      break;
+      case 1: result='J';
+      break;
+      case 2: result='D';
+      break;
+      case 3: result='Y';
+      break;
+      case 4: result='K';
+      break;
+      case 5: result='T';
+      break;
+      case 6: result='S';
+      break;
+      case 7: result='Z';
+      break;
+      case 8: result='O';
+      break;
+      case 9: result='L';
+      break;
+      case 10: result='X';
+      break;
+      case 11: result='M';
+      break;
+      case 12: result='C';
+      break;
+      case 13: result='V';
+      break;
+      case 14: result='B';
+      break;
+      case 15: result='U';
+      break;
+      case 16: result='I';
+      break;
+      case 17: result='E';
+      break;
+      case 18: result='W';
+      break;
+      case 19: result='P';
+      break;
+      case 20: result='N';
+      break;
+      case 21: result='F';
+      break;
+      case 22: result='H';
+      break;
+      case 23: result='R';
+      break;
+   }
+
    return result;
 }
 
@@ -459,7 +575,7 @@ int calcPixel(cv::Mat crop, int x, int y) {
 		}
 	}
 
-	std::cout << "count" << cnt << std::endl;
+	//std::cout << "count" << cnt << std::endl;
 	return cnt;
 }
 
@@ -501,51 +617,96 @@ void readImg(cv::Mat image, std::string imgName) {
 
 	calcX(newImg);
 	calcY(newImg);
+	
 
 	(newImg);
 
 	cv::imshow("aaaaa", newImg);
 	std::ostringstream filename;
 	filename << imgName << 1 << ".jpg";
-	std::cout << "filename: " << filename.str() << std::endl;
+	//std::cout << "filename: " << filename.str() << std::endl;
 	cv::Rect myROI(windowX[0][0], windowY[0][0], windowX[0][1] - windowX[0][0], windowY[0][1] - windowY[0][0]);
 	cv::Mat croppedImg = newImg(myROI);
-	result[0]=compareImg(croppedImg);
+	if(windowX[0][1] - windowX[0][0] < 12) {
+	   result[0]='I';
+	}
+	else if(windowX[0][1] - windowX[0][0] < 14) {
+	   result[0]='J';
+	}
+	else {
+	   result[0]=compareImg(croppedImg);
+	}
 
 	imwrite(filename.str(), croppedImg);
 	pixel = calcPixel(croppedImg, windowX[0][1] - windowX[0][0], windowY[0][1] - windowY[0][0]);
 
 	std::ostringstream filename2;
 	filename2 << imgName << 2 << ".jpg";
-	std::cout << "filename: " << filename2.str() << std::endl;
+	//std::cout << "filename: " << filename2.str() << std::endl;
 	cv::Rect secROI(windowX[1][0], windowY[1][0], windowX[1][1] - windowX[1][0], windowY[1][1] - windowY[1][0]);
 	croppedImg = newImg(secROI);
 	imwrite(filename2.str(), croppedImg);
 	pixel = calcPixel(croppedImg, windowX[1][1] - windowX[1][0], windowY[1][1] - windowY[1][0]);
+	if(windowX[1][1] - windowX[1][0] < 12) {
+	   result[1]='I';
+	}
+	else if(windowX[1][1] - windowX[1][0] < 14) {
+	   result[1]='J';
+	}
+	else {
+	   result[1]=compareImgSecond(croppedImg);
+	}
 
 	std::ostringstream filename3;
 	filename3 << imgName << 3 << ".jpg";
-	std::cout << "filename: " << filename3.str() << std::endl;
+	//std::cout << "filename: " << filename3.str() << std::endl;
 	cv::Rect thiROI(windowX[2][0], windowY[2][0], windowX[2][1] - windowX[2][0], windowY[2][1] - windowY[2][0]);
 	croppedImg = newImg(thiROI);
 	imwrite(filename3.str(), croppedImg);
 	pixel = calcPixel(croppedImg, windowX[2][1] - windowX[2][0], windowY[2][1] - windowY[2][0]);
+	if(windowX[2][1] - windowX[2][0] < 12) {
+	   result[2]='I';
+	}
+	else if(windowX[2][1] - windowX[2][0] < 14) {
+	   result[2]='J';
+	}
+	else {
+	   //result[2]=compareImg(croppedImg);
+	}
 
 	std::ostringstream filename4;
 	filename4 << imgName << 4 << ".jpg";
-	std::cout << "filename: " << filename4.str() << std::endl;
+	//std::cout << "filename: " << filename4.str() << std::endl;
 	cv::Rect forROI(windowX[3][0], windowY[3][0], windowX[3][1] - windowX[3][0], windowY[3][1] - windowY[3][0]);
 	croppedImg = newImg(forROI);
 	imwrite(filename4.str(), croppedImg);
 	pixel = calcPixel(croppedImg, windowX[3][1] - windowX[3][0], windowY[3][1] - windowY[3][0]);
+	if(windowX[3][1] - windowX[3][0] < 12) {
+	   result[3]='I';
+	}
+	else if(windowX[3][1] - windowX[3][0] < 14) {
+	   result[3]='J';
+	}
+	else {
+	   //result[3]=compareImg(croppedImg);
+	}
 
 	std::ostringstream filename5;
 	filename5 << imgName << 5 << ".jpg";
-	std::cout << "filename: " << filename5.str() << std::endl;
+	//std::cout << "filename: " << filename5.str() << std::endl;
 	cv::Rect fifROI(windowX[4][0], windowY[4][0], windowX[4][1] - windowX[4][0], windowY[4][1] - windowY[4][0]);
 	croppedImg = newImg(fifROI);
 	imwrite(filename5.str(), croppedImg);
 	pixel = calcPixel(croppedImg, windowX[4][1] - windowX[4][0], windowY[4][1] - windowY[4][0]);
+	if(windowX[4][1] - windowX[4][0] < 12) {
+	   result[4]='I';
+	}
+	else if(windowX[4][1] - windowX[4][0] < 14) {
+	   result[4]='J';
+	}
+	else {
+	   //result[4]=compareImg(croppedImg);
+	}
 
 	cv::waitKey(0);
 
@@ -564,6 +725,7 @@ int main()
 	int cnt = 1;
 	struct dirent *ent;
 	readFirst();
+	readSecond();
 	if (dir != NULL) {
 		while ((ent = readdir(dir)) != NULL) {
 			imgName = ent->d_name;
