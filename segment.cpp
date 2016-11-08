@@ -11,6 +11,9 @@ int windowY[5][2];
 double fileIdx;
 cv::Mat first[28];
 cv::Mat second[28];
+cv::Mat third[28];
+cv::Mat fourth[28];
+cv::Mat fifth[28];
 
 
 int calcPixel(cv::Mat crop, int x, int y);
@@ -386,6 +389,124 @@ void readSecond() {
 
 }
 
+void readThird() {
+   std::string dirName = "/home/seongmo/다운로드/git/3rd/";
+	DIR *dir;
+	dir = opendir(dirName.c_str());
+	std::string imgName;
+	fileIdx = 0;
+	cv::Mat image;
+	int cnt = 0;
+	struct dirent *ent;
+	if (dir != NULL) {
+		while ((ent = readdir(dir)) != NULL) {
+			imgName = ent->d_name;
+			if (imgName == "." || imgName == "..") continue;
+			std::string fullPath(dirName + imgName);
+			std::cout << fullPath << std::endl;
+			third[cnt] = cv::imread(fullPath, 0);
+			cnt++;
+		}
+		closedir(dir);
+	}
+	else {
+		std::cout << "Error!" << std::endl;
+	}
+	if (!image.data)
+		return ;
+
+}
+
+char compareImgThird(cv::Mat croppedImg) {
+   int cols = croppedImg.cols;
+   int rows = croppedImg.rows;
+   int cnt=0;
+   float max=0;
+   int maxIdx=100;
+   int pixel[28];
+   char result='A';
+   for(int i=0; i<24; i++) {
+      pixel[i]=calcPixel(third[i], third[i].cols, third[i].rows);
+      for(int j=0; j<cols; j++) {
+         for(int k=0; k<rows; k++) {
+            if(third[i].at<uchar>(k, j)==255) {
+               if(croppedImg.at<uchar>(k, j)==255) {
+                  cnt++;
+               }
+               else {
+                  cnt--;
+               }
+            }
+            if(croppedImg.at<uchar>(k, j)==0) {
+               if(third[i].at<uchar>(k, j)==255) {
+                  cnt--;
+               }
+            }
+         }
+      }
+ //     std::cout<<"index: "<<i <<" percent: "<<((float)cnt)/(cols*rows)<<std::endl;
+      if(max<((float)cnt)/(cols*rows) ) {
+         max=((float)cnt)/(cols*rows);
+         maxIdx=i;
+      }
+      cnt=0;
+   }
+   std::cout<<"MaxIdx3: "<<maxIdx<<std::endl;
+   cv::imshow("answer3", third[maxIdx]);
+   
+   switch(maxIdx) {
+      case 0: result='G';
+      break;
+      case 1: result='J';
+      break;
+      case 2: result='D';
+      break;
+      case 3: result='Y';
+      break;
+      case 4: result='K';
+      break;
+      case 5: result='T';
+      break;
+      case 6: result='S';
+      break;
+      case 7: result='Z';
+      break;
+      case 8: result='O';
+      break;
+      case 9: result='L';
+      break;
+      case 10: result='X';
+      break;
+      case 11: result='M';
+      break;
+      case 12: result='C';
+      break;
+      case 13: result='V';
+      break;
+      case 14: result='B';
+      break;
+      case 15: result='U';
+      break;
+      case 16: result='I';
+      break;
+      case 17: result='E';
+      break;
+      case 18: result='W';
+      break;
+      case 19: result='P';
+      break;
+      case 20: result='N';
+      break;
+      case 21: result='F';
+      break;
+      case 22: result='H';
+      break;
+      case 23: result='R';
+      break;
+   }
+   return result;
+}
+
 char compareImgSecond(cv::Mat croppedImg) {
    int cols = croppedImg.cols;
    int rows = croppedImg.rows;
@@ -420,7 +541,7 @@ char compareImgSecond(cv::Mat croppedImg) {
       }
       cnt=0;
    }
-   std::cout<<"MaxIdx: "<<maxIdx<<std::endl;
+   std::cout<<"MaxIdx2: "<<maxIdx<<std::endl;
    cv::imshow("answer2", second[maxIdx]);
    
    switch(maxIdx) {
@@ -671,7 +792,7 @@ void readImg(cv::Mat image, std::string imgName) {
 	   result[2]='J';
 	}
 	else {
-	   //result[2]=compareImg(croppedImg);
+	   result[2]=compareImgThird(croppedImg);
 	}
 
 	std::ostringstream filename4;
@@ -726,6 +847,7 @@ int main()
 	struct dirent *ent;
 	readFirst();
 	readSecond();
+	readThird();
 	if (dir != NULL) {
 		while ((ent = readdir(dir)) != NULL) {
 			imgName = ent->d_name;
