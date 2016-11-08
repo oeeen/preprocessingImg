@@ -33,11 +33,12 @@ int main()
    cv::Mat image;
    string imgName;
    string dirName ;
+   int temp, min , max ;
    struct dirent *ent;
 
    for( ; folder < 91 ; folder++) {
       s_folder = (char)folder;
-      dirName = "/home/ilyoung/preprocessingImg-master/101_200_sort/"+s_folder+"/";
+      dirName = "/home/ilyoung/preprocessingImg-master/201_410/"+s_folder+"/";
       dir = opendir(dirName.c_str());
       fileIdx=0;
       if( dir !=NULL ) {
@@ -48,10 +49,18 @@ int main()
             //cout<<fullPath<<endl;
             image = cv::imread(fullPath, 0);
             cnt++;
-            temp_total += calcPixel(image,image.cols,image.rows);
+            temp = calcPixel(image,image.cols,image.rows);
+            temp_total += temp;
+            if(cnt == 0 || cnt == 1) {
+               min = temp_total;
+               max = temp_total;
+            }
+            else if(min > temp) min = temp;
+            else if(max < temp) max = temp;
          }
+//cout << min << "/" << max << endl;
          if(cnt != 0) {
-            cout << s_folder << " Average " << temp_total / cnt << endl ;
+            cout << s_folder << " Average " << (temp_total-min-max) / cnt << endl ;
             cnt =0 ;
             temp_total =0;
          }
