@@ -1,12 +1,11 @@
-폴더
+﻿폴더
   AnwswerSet - 정답셋
-  temp - test set
-  test - java 컴파일 결과 클래스 파일
+  temp       - test set
+  test       - java compile result
 
 파일
-  Makefile
-  make       - cpp 컴파일 파일
-  out
+  Makefile   - cpp compile
+  make
   output.txt - cpp result
   segment.cpp
 
@@ -16,10 +15,13 @@
 
 
 java 코드안에 make all 넣어놔서 cpp 컴파일도 같이 되도록 했음.
-java compile 방법
-  1. javac -d . *java     -> test 폴더 생김(안에 class file )
-  2. java -cp . test.test -> java 실행
+1. 코드 내 파일 경로 수정
+  1.1 segment.cpp / swing.java 내의 파일 경로를 자신의 컴퓨터 경로에 맞게 수정
+2. java compile 방법
+  2.1 javac -d . *java     -> test 폴더 생성(안에 class file )
+3. java 실행 (jar파일을 만들어 실행을 원할 경우 생략 가능)  
+  3.1 java -cp . test.test -> java 실행
 
-jar 파일 생성 및 실행
-  Jar -cvmf manifest.txt test.jar test/*.class
-  java -jar test.jar
+4. jar 파일 생성 및 실행
+  4.1 Jar -cvmf manifest.txt test.jar test/*.class
+  4.2 java -jar test.jar
