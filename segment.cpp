@@ -188,10 +188,12 @@ char compareImg(cv::Mat croppedImg) {
    int cols = croppedImg.cols;
    int rows = croppedImg.rows;
    int cnt=0;
-   float max=0;
+   float max=-100.0;
    int maxIdx=100;
    int pixel[72];
    char result='A';
+   float percent[72];
+   float alpha[24];
    
    for(int i=0; i<72; i++) {
       pixel[i]=calcPixel(answer[i], answer[i].cols, answer[i].rows);
@@ -217,9 +219,93 @@ char compareImg(cv::Mat croppedImg) {
          max=((float)cnt)/(cols*rows);
          maxIdx=i;
       }
+      //percent[i]=((float)cnt)/(cols*rows);
       cnt=0;
    }
 
+/*
+   alpha[0]=percent[8]+percent[21]+percent[48]; //B
+   alpha[1]=percent[1]+percent[34]+percent[50]; //C
+   alpha[2]=percent[12]+percent[67]+percent[71]; //D
+   alpha[3]=percent[15]+percent[43]+percent[46]; //E
+   alpha[4]=percent[4]+percent[29]+percent[62]; //F
+   alpha[5]=percent[6]+percent[35]+percent[64]; //G
+   alpha[6]=percent[0]+percent[61]+percent[69]; //H
+   alpha[7]=percent[23]+percent[27]+percent[63]; //I
+   alpha[8]=percent[2]+percent[30]+percent[49]; //J
+   alpha[9]=percent[33]+percent[59]+percent[68]; //K
+   alpha[10]=percent[32]+percent[42]+percent[65]; //L
+   alpha[11]=percent[14]+percent[56]+percent[48]; //M
+   alpha[12]=percent[13]+percent[26]+percent[36]; //N
+   alpha[13]=percent[7]+percent[24]+percent[44]; //O
+   alpha[14]=percent[37]+percent[52]+percent[53]; //P
+   alpha[15]=percent[16]+percent[17]+percent[18]; //R
+   alpha[16]=percent[10]+percent[11]+percent[70]; //S 
+   alpha[17]=percent[20]+percent[22]+percent[45]; //T
+   alpha[18]=percent[47]+percent[60]+percent[66]; //U
+   alpha[19]=percent[41]+percent[51]+percent[58]; //V
+   alpha[20]=percent[19]+percent[25]+percent[31]; //W
+   alpha[21]=percent[5]+percent[39]+percent[54]; //X
+   alpha[22]=percent[3]+percent[38]+percent[57]; //Y
+   alpha[23]=percent[28]+percent[40]+percent[55]; //Z
+   
+   max=0.0;
+   for(int i = 0; i<24; i++) {
+      if(max<alpha[i]) {
+         max=((float)cnt)/(cols*rows);
+         maxIdx=i;
+      }
+   }
+   switch(maxIdx) {
+      case 0: result='B';
+      break;
+      case 1: result='C';
+      break;
+      case 2: result='D';
+      break;
+      case 3: result='E';
+      break;
+      case 4: result='F';
+      break;
+      case 5: result='G';
+      break;
+      case 6: result='H';
+      break;
+      case 7: result='I';
+      break;
+      case 8: result='J';
+      break;
+      case 9: result='K';
+      break;
+      case 10: result='L';
+      break;
+      case 11: result='M';
+      break;
+      case 12: result='N';
+      break;
+      case 13: result='O';
+      break;
+      case 14: result='P';
+      break;
+      case 15: result='R';
+      break;
+      case 16: result='S';
+      break;
+      case 17: result='T';
+      break;
+      case 18: result='U';
+      break;
+      case 19: result='V';
+      break;
+      case 20: result='W';
+      break;
+      case 21: result='X';
+      break;
+      case 22: result='Y';
+      break;
+      case 23: result='Z';
+      break;
+   }*/
    
    switch(maxIdx) {
       case 0: result='H';
@@ -367,7 +453,6 @@ char compareImg(cv::Mat croppedImg) {
       case 71: result='D';
       break;
    }
-
    return result;
 }
 
@@ -494,9 +579,14 @@ int main()
 	std::string imgName;
 	fileIdx = 0;
 	cv::Mat image;
-	int cnt = 1;
+	int cnt = 0;
+	int ans = 0;
+	int ansSet[24]={0, };
+	int ansCnt[24]={0, };
 	struct dirent *ent;
-	std::string tmp="";
+	std::string tmp;
+	std::string tmpchar;
+	std::string tmpImgName;
 	std::ofstream outFile("output.txt");
 	readAnswerSet();
 	if (dir != NULL) {
@@ -508,18 +598,98 @@ int main()
 			image = cv::imread(fullPath, 0);
 			tmp=readImg(image, imgName);
 			cnt++;
-			outFile << imgName << "\t" << tmp << std::endl;
+			outFile << imgName << "\t" << tmp.substr(0,5) << std::endl;
+			if(tmp.substr(0,5).compare(imgName.substr(0,5))==0)ans++;
+			for(int i =0; i<5; i++) {
+			   if(tmp.substr(i,1).compare(imgName.substr(i,1))==0) {
+			      tmpchar=tmp.substr(i,1);
+			      if(tmpchar=="B") ansSet[0]++;
+			      if(tmpchar=="C") ansSet[1]++;
+			      if(tmpchar=="D") ansSet[2]++;
+			      if(tmpchar=="E") ansSet[3]++;
+			      if(tmpchar=="F") ansSet[4]++;
+			      if(tmpchar=="G") ansSet[5]++;
+			      if(tmpchar=="H") ansSet[6]++;
+			      if(tmpchar=="I") ansSet[7]++;
+			      if(tmpchar=="J") ansSet[8]++;
+			      if(tmpchar=="K") ansSet[9]++;
+			      if(tmpchar=="L") ansSet[10]++;
+			      if(tmpchar=="M") ansSet[11]++;
+			      if(tmpchar=="N") ansSet[12]++;
+			      if(tmpchar=="O") ansSet[13]++;
+			      if(tmpchar=="P") ansSet[14]++;
+			      if(tmpchar=="R") ansSet[15]++;
+			      if(tmpchar=="S") ansSet[16]++;
+			      if(tmpchar=="T") ansSet[17]++;
+			      if(tmpchar=="U") ansSet[18]++;
+			      if(tmpchar=="V") ansSet[19]++;
+			      if(tmpchar=="W") ansSet[20]++;
+			      if(tmpchar=="X") ansSet[21]++;
+			      if(tmpchar=="Y") ansSet[22]++;
+			      if(tmpchar=="Z") ansSet[23]++;
+			   }
+			   tmpImgName=imgName.substr(i,1);
+			   if(tmpImgName=="B") ansCnt[0]++;
+			   if(tmpImgName=="C") ansCnt[1]++;
+			   if(tmpImgName=="D") ansCnt[2]++;
+			   if(tmpImgName=="E") ansCnt[3]++;
+			   if(tmpImgName=="F") ansCnt[4]++;
+			   if(tmpImgName=="G") ansCnt[5]++;
+			   if(tmpImgName=="H") ansCnt[6]++;
+			   if(tmpImgName=="I") ansCnt[7]++;
+            if(tmpImgName=="J") ansCnt[8]++;
+		      if(tmpImgName=="K") ansCnt[9]++;
+		      if(tmpImgName=="L") ansCnt[10]++;
+		      if(tmpImgName=="M") ansCnt[11]++;
+		      if(tmpImgName=="N") ansCnt[12]++;
+		      if(tmpImgName=="O") ansCnt[13]++;
+		      if(tmpImgName=="P") ansCnt[14]++;
+		      if(tmpImgName=="R") ansCnt[15]++;
+		      if(tmpImgName=="S") ansCnt[16]++;
+		      if(tmpImgName=="T") ansCnt[17]++;
+		      if(tmpImgName=="U") ansCnt[18]++;
+		      if(tmpImgName=="V") ansCnt[19]++;
+		      if(tmpImgName=="W") ansCnt[20]++;
+		      if(tmpImgName=="X") ansCnt[21]++;
+		      if(tmpImgName=="Y") ansCnt[22]++;
+		      if(tmpImgName=="Z") ansCnt[23]++;
+			}
 		}
 		closedir(dir);
-		outFile.close();
+		
 	}
 	else {
 		std::cout << "Error!" << std::endl;
 	}
 	if (!image.data)
 		return 0;
+   outFile<<"B: "<<((float)ansSet[0])/ansCnt[0]*100<<"%"<<std::endl;
+   outFile<<"C: "<<((float)ansSet[1])/ansCnt[1]*100<<"%"<<std::endl;
+   outFile<<"D: "<<((float)ansSet[2])/ansCnt[2]*100<<"%"<<std::endl;
+   outFile<<"E: "<<((float)ansSet[3])/ansCnt[3]*100<<"%"<<std::endl;
+   outFile<<"F: "<<((float)ansSet[4])/ansCnt[4]*100<<"%"<<std::endl;
+   outFile<<"G: "<<((float)ansSet[5])/ansCnt[5]*100<<"%"<<std::endl;
+   outFile<<"H: "<<((float)ansSet[6])/ansCnt[6]*100<<"%"<<std::endl;
+   outFile<<"I: "<<((float)ansSet[7])/ansCnt[7]*100<<"%"<<std::endl;
+   outFile<<"J: "<<((float)ansSet[8])/ansCnt[8]*100<<"%"<<std::endl;
+   outFile<<"K: "<<((float)ansSet[9])/ansCnt[9]*100<<"%"<<std::endl;
+   outFile<<"L: "<<((float)ansSet[10])/ansCnt[10]*100<<"%"<<std::endl;
+   outFile<<"M: "<<((float)ansSet[11])/ansCnt[11]*100<<"%"<<std::endl;
+   outFile<<"N: "<<((float)ansSet[12])/ansCnt[12]*100<<"%"<<std::endl;
+   outFile<<"O: "<<((float)ansSet[13])/ansCnt[13]*100<<"%"<<std::endl;
+   outFile<<"P: "<<((float)ansSet[14])/ansCnt[14]*100<<"%"<<std::endl;
+   outFile<<"R: "<<((float)ansSet[15])/ansCnt[15]*100<<"%"<<std::endl;
+   outFile<<"S: "<<((float)ansSet[16])/ansCnt[16]*100<<"%"<<std::endl;
+   outFile<<"T: "<<((float)ansSet[17])/ansCnt[17]*100<<"%"<<std::endl;
+   outFile<<"U: "<<((float)ansSet[18])/ansCnt[18]*100<<"%"<<std::endl;
+   outFile<<"V: "<<((float)ansSet[19])/ansCnt[19]*100<<"%"<<std::endl;
+   outFile<<"W: "<<((float)ansSet[20])/ansCnt[20]*100<<"%"<<std::endl;
+   outFile<<"X: "<<((float)ansSet[21])/ansCnt[21]*100<<"%"<<std::endl;
+   outFile<<"Y: "<<((float)ansSet[22])/ansCnt[22]*100<<"%"<<std::endl;
+   outFile<<"Z: "<<((float)ansSet[23])/ansCnt[23]*100<<"%"<<std::endl;
+   outFile<<"Total count: " <<cnt <<" Total answer: "<<ans<<std::endl;
+   outFile<<"Success rate: "<<((float)ans)/cnt*100<<"%"<<std::endl;
 
-
-
+   outFile.close();
 	return 0;
 }
