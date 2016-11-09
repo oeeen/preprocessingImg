@@ -1,10 +1,32 @@
+#if defined(__WIN32__) || defined(_WIN32) || defined(WIN32) || defined(__WINDOWS__) || defined(__TOS_WIN__)
+
+  #include <windows.h>
+
+  inline void delay( unsigned long ms )
+    {
+    Sleep( ms );
+    }
+
+#else  /* presume POSIX */
+
+  #include <unistd.h>
+
+  inline void delay( unsigned long ms )
+    {
+    usleep( ms * 1000 );
+    }
+
+#endif 
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <string>
 #include <dirent.h>
+#include <fstream>
 
+#define DIR_NAME "/home/seongmo/다운로드/git/temp/"
+#define ANSWER_DIR "/home/seongmo/다운로드/git/Answerset/"
 
 int windowX[5][2];
 int windowY[5][2];
@@ -49,8 +71,6 @@ void calcX(cv::Mat origin) {
 									if (origin.at<uchar>(j, k) == 255 && origin.at<uchar>(j, k + 1) == 255) cnt2++;
 								}
 								if (cnt2 == 0) {
-
-									//std::cout << windowX[idxX][0] << " " << k << " " << windowX[idxX][1] << std::endl;
 									windowX[idxX + 1][1] = windowX[idxX][1];
 									windowX[idxX][1] = k + 1;
 									idxX++;
@@ -69,9 +89,6 @@ void calcX(cv::Mat origin) {
 		cnt = 0;
 		if (idxX > 4) break;
 	}
-	for (int i = 0; i<5; i++) {
-		std::cout << windowX[i][0] << " " << windowX[i][1] << std::endl;
-	}
 }
 void calcY(cv::Mat origin) {
    int cnt = 0, temp=0 ;
@@ -85,7 +102,6 @@ void calcY(cv::Mat origin) {
             if((j-temp) >=20) {
                windowY[idxX][0] = temp ;
                windowY[idxX][1] = j ;
-               //std::cout <<temp <<" // " << j <<std::endl;
                temp =0 ;
                break;
             }
@@ -98,7 +114,6 @@ void calcY(cv::Mat origin) {
          else if(j==47) {
             windowY[idxX][0] = temp ;
             windowY[idxX][1] = j ;
-            //std::cout <<temp <<" / " << j <<std::endl;
             temp =0 ;
          }
       
@@ -141,7 +156,7 @@ cv::Mat rmNoise(cv::Mat origin) {
 }
 
 void readAnswerSet() {
-   std::string dirName = "/home/seongmo/다운로드/git/Answerset/";
+   std::string dirName = ANSWER_DIR;
 	DIR *dir;
 	dir = opendir(dirName.c_str());
 	std::string imgName;
@@ -365,41 +380,15 @@ int calcPixel(cv::Mat crop, int x, int y) {
 			if (crop.at<uchar>(j, i) == 255) cnt++;
 		}
 	}
-
-	//std::cout << "count" << cnt << std::endl;
 	return cnt;
 }
 
-void readImg(cv::Mat image, std::string imgName) {
-	cv::Mat thresholded; // 경계값으로 이진 영상 생성
+std::string readImg(cv::Mat image, std::string imgName) {
+	cv::Mat thresholded; 
 	cv::threshold(~image, thresholded, 1, 255, cv::THRESH_BINARY);
-	/*cv::namedWindow("Binary Image"); // 경계화된 영상 띄워 보기
-	cv::imshow("Binary Image",thresholded); // 배경과 전경이 분할됨
-	imwrite("./thresholded.jpg", thresholded);
-	cv::Mat tmpd;*/
-	//cv::Mat proImg = removeNoise(thresholded);
+
 	cv::Mat newImg = rmNoise(thresholded);
-	//cv::Mat rmLineImg = rmLine(newImg);
-	//cv::Mat lastImg = rmLine(rmLineImg);
-	//proImg = removeNoise(proImg);
-	//cv::dilate(lastImg, tmpd, cv::Mat());
-	//cv::dilate(tmpd, tmpd, cv::Mat());
-	/* cv::erode(tmpd, tmpd, cv::Mat());
-	cv::imshow("processed image", proImg);
-	cv::imshow("removed line image", lastImg);
-	cv::imshow("new version", newImg);
 
-	cv::imshow("dilated image", tmpd);
-	cv::imwrite("./processed.jpg", proImg);
-	cv::imwrite("./dilated.jpg", tmpd);
-	cv::imwrite("./process.jpg", proImg);
-	cv::imwrite("./last.jpg", lastImg);
-	cv::imwrite("./new.jpg", newImg);
-	cv::imwrite("./dil.jpg", tmpd);
-	cv::Mat eroded;
-	cv::Mat dilated;
-
-	cv::imwrite("./reverse.jpg", ~newImg);*/
 
 	char result[5];
 	int pixel;
@@ -409,15 +398,12 @@ void readImg(cv::Mat image, std::string imgName) {
 	calcX(newImg);
 	calcY(newImg);
 	
-	for (int i = 0; i<5; i++) {
-		std::cout << windowY[i][0] << " " << windowY[i][1] << std::endl;
-	}
+	
 
 
 	cv::imshow("aaaaa", newImg);
 	std::ostringstream filename;
 	filename << imgName << 1 << ".jpg";
-	//std::cout << "filename: " << filename.str() << std::endl;
 	cv::Rect myROI(windowX[0][0], windowY[0][0], windowX[0][1] - windowX[0][0], windowY[0][1] - windowY[0][0]);
 	cv::Mat croppedImg = newImg(myROI);
 	if(windowX[0][1] - windowX[0][0] < 12) {
@@ -430,15 +416,14 @@ void readImg(cv::Mat image, std::string imgName) {
 	   result[0]=compareImg(croppedImg);
 	}
 
-	imwrite(filename.str(), croppedImg);
+	//imwrite(filename.str(), croppedImg);
 	pixel = calcPixel(croppedImg, windowX[0][1] - windowX[0][0], windowY[0][1] - windowY[0][0]);
 
 	std::ostringstream filename2;
 	filename2 << imgName << 2 << ".jpg";
-	//std::cout << "filename: " << filename2.str() << std::endl;
 	cv::Rect secROI(windowX[1][0], windowY[1][0], windowX[1][1] - windowX[1][0], windowY[1][1] - windowY[1][0]);
 	croppedImg = newImg(secROI);
-	imwrite(filename2.str(), croppedImg);
+	//imwrite(filename2.str(), croppedImg);
 	pixel = calcPixel(croppedImg, windowX[1][1] - windowX[1][0], windowY[1][1] - windowY[1][0]);
 	if(windowX[1][1] - windowX[1][0] < 12) {
 	   result[1]='I';
@@ -452,10 +437,9 @@ void readImg(cv::Mat image, std::string imgName) {
 
 	std::ostringstream filename3;
 	filename3 << imgName << 3 << ".jpg";
-	//std::cout << "filename: " << filename3.str() << std::endl;
 	cv::Rect thiROI(windowX[2][0], windowY[2][0], windowX[2][1] - windowX[2][0], windowY[2][1] - windowY[2][0]);
 	croppedImg = newImg(thiROI);
-	imwrite(filename3.str(), croppedImg);
+	//imwrite(filename3.str(), croppedImg);
 	pixel = calcPixel(croppedImg, windowX[2][1] - windowX[2][0], windowY[2][1] - windowY[2][0]);
 	if(windowX[2][1] - windowX[2][0] < 12) {
 	   result[2]='I';
@@ -469,10 +453,9 @@ void readImg(cv::Mat image, std::string imgName) {
 
 	std::ostringstream filename4;
 	filename4 << imgName << 4 << ".jpg";
-	//std::cout << "filename: " << filename4.str() << std::endl;
 	cv::Rect forROI(windowX[3][0], windowY[3][0], windowX[3][1] - windowX[3][0], windowY[3][1] - windowY[3][0]);
 	croppedImg = newImg(forROI);
-	imwrite(filename4.str(), croppedImg);
+	//imwrite(filename4.str(), croppedImg);
 	pixel = calcPixel(croppedImg, windowX[3][1] - windowX[3][0], windowY[3][1] - windowY[3][0]);
 	if(windowX[3][1] - windowX[3][0] < 12) {
 	   result[3]='I';
@@ -486,10 +469,9 @@ void readImg(cv::Mat image, std::string imgName) {
 
 	std::ostringstream filename5;
 	filename5 << imgName << 5 << ".jpg";
-	//std::cout << "filename: " << filename5.str() << std::endl;
 	cv::Rect fifROI(windowX[4][0], windowY[4][0], windowX[4][1] - windowX[4][0], windowY[4][1] - windowY[4][0]);
 	croppedImg = newImg(fifROI);
-	imwrite(filename5.str(), croppedImg);
+	//imwrite(filename5.str(), croppedImg);
 	pixel = calcPixel(croppedImg, windowX[4][1] - windowX[4][0], windowY[4][1] - windowY[4][0]);
 	if(windowX[4][1] - windowX[4][0] < 12) {
 	   result[4]='I';
@@ -502,14 +484,11 @@ void readImg(cv::Mat image, std::string imgName) {
 	}
 
 	cv::waitKey(0);
-
-	std::cout << result << std::endl;
-
-	return;
+	return result;
 }
 int main()
 {
-	std::string dirName = "/home/seongmo/다운로드/git/temp/";
+	std::string dirName = DIR_NAME;
 	DIR *dir;
 	dir = opendir(dirName.c_str());
 	std::string imgName;
@@ -517,6 +496,8 @@ int main()
 	cv::Mat image;
 	int cnt = 1;
 	struct dirent *ent;
+	std::string tmp="";
+	std::ofstream outFile("output.txt");
 	readAnswerSet();
 	if (dir != NULL) {
 		while ((ent = readdir(dir)) != NULL) {
@@ -525,10 +506,12 @@ int main()
 			std::string fullPath(dirName + imgName);
 			std::cout << fullPath << std::endl;
 			image = cv::imread(fullPath, 0);
-			readImg(image, imgName);
+			tmp=readImg(image, imgName);
 			cnt++;
+			outFile << imgName << "\t" << tmp << std::endl;
 		}
 		closedir(dir);
+		outFile.close();
 	}
 	else {
 		std::cout << "Error!" << std::endl;

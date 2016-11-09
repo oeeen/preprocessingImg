@@ -3,5 +3,4 @@ all:
 	./out
 
 clean:
-	rm *.jpg
 	rm out
