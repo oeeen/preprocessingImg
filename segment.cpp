@@ -78,14 +78,36 @@ void calcX(cv::Mat origin) {
 	}
 }
 void calcY(cv::Mat origin) {
-	for (int i = 0; i < 5; i++) {
-		windowY[i][0] = 7;
-		windowY[i][1] = 47;
-	}
-
-	for (int i = 0; i<5; i++) {
-		//std::cout << windowY[i][0] << " " << windowY[i][1] << std::endl;
-	}
+   int cnt = 0, temp=0 ;
+   for(int idxX = 0 ; idxX <5 ;idxX ++ ) {
+      for(int j=7 ; j<48 ; j++) {
+         cnt=0;
+         for(int i = windowX[idxX][0] ; i < windowX[idxX][1] ; i++) {
+            if(origin.at<uchar>(j, i)==255) {cnt++; break;}
+         }
+         if(cnt==0) {   //검은선
+            if((j-temp) >=20) {
+               windowY[idxX][0] = temp ;
+               windowY[idxX][1] = j ;
+               //std::cout <<temp <<" // " << j <<std::endl;
+               temp =0 ;
+               break;
+            }
+            else {temp=0;
+            }
+         }
+         else if(temp<7){  //흰선 + 처음 점 미설정
+            temp = j;
+         }
+         else if(j==47) {
+            windowY[idxX][0] = temp ;
+            windowY[idxX][1] = j ;
+            //std::cout <<temp <<" / " << j <<std::endl;
+            temp =0 ;
+         }
+      
+      }
+   }
 }
 /*void calcY(cv::Mat origin) {
 int idxX=0;
