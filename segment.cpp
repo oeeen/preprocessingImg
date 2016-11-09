@@ -9,11 +9,7 @@
 int windowX[5][2];
 int windowY[5][2];
 double fileIdx;
-cv::Mat first[28];
-cv::Mat second[28];
-cv::Mat third[28];
-cv::Mat fourth[28];
-cv::Mat fifth[28];
+cv::Mat answer[78];
 
 
 int calcPixel(cv::Mat crop, int x, int y);
@@ -74,7 +70,7 @@ void calcX(cv::Mat origin) {
 		if (idxX > 4) break;
 	}
 	for (int i = 0; i<5; i++) {
-		//std::cout << windowX[i][0] << " " << windowX[i][1] << std::endl;
+		std::cout << windowX[i][0] << " " << windowX[i][1] << std::endl;
 	}
 }
 void calcY(cv::Mat origin) {
@@ -109,185 +105,6 @@ void calcY(cv::Mat origin) {
       }
    }
 }
-/*void calcY(cv::Mat origin) {
-int idxX=0;
-int cnt=0;
-int flag=0;
-for(int j = 0; j<50; j++) {
-for(int i = windowX[idxX][0] ; i < windowX[idxX][1] ; i++) {
-if(origin.at<uchar>(j, i)==255) cnt++;
-}
-if(cnt>0 && flag==0) {
-flag=1;
-windowY[idxX][0]=j;
-}
-if(flag==1 && cnt==0) {
-for(int i = windowX[idxX][0] ; i < windowX[idxX][1] ; i++) {
-if(origin.at<uchar>(j+1, i)==255) cnt++;
-}
-if(cnt==0) {
-for(int i = windowX[idxX][0] ; i < windowX[idxX][1] ; i++) {
-if(origin.at<uchar>(j+2, i)==255) cnt++;
-}
-if(cnt==0) {
-for(int i = windowX[idxX][0] ; i < windowX[idxX][1] ; i++) {
-if(origin.at<uchar>(j+3, i)==255) cnt++;
-}
-if(cnt==0) {
-flag=0;
-windowY[idxX][1]=j;
-idxX++;
-j=0;
-}
-}
-}
-}
-cnt=0;
-}
-for(int i = 0; i<5; i++) {
-std::cout<<windowY[i][0]<<" "<<windowY[i][1]<<std::endl;
-}
-}*/
-/*
-cv::Mat rmLine(cv::Mat origin) {
-cv::Mat result(50, 198, CV_8U);
-int startx=0, starty=0;
-int cond=0; // 1 대각선 위, 0 옆으로, -1 대각선 아래
-
-for(int i = 0; i<198; i++) {
-for(int j = 0; j<50; j++) {
-result.at<uchar>(j, i)=origin.at<uchar>(j, i);
-}
-}
-
-cv::imshow("ABCDEF", origin);
-
-for(int i = 0; i<198; i++) {
-for(int j = 0; j<50; j++) {
-if(origin.at<uchar>(j, i)==255) {
-startx=i;
-starty=j;
-std::cout<<"start x: "<<startx <<" starty: "<<starty<<std::endl;
-break;
-}
-}
-if(startx!=0) break;
-}
-std::cout<<(int)result.at<uchar>(19,19)<<std::endl;
-int presx=startx;
-int presy=starty;
-int flag=0;
-for(int i = startx; i<198; i++) {
-presx=i;
-flag=0;
-int tmpy=presy;
-if(cond==1) {
-if(origin.at<uchar>(tmpy-1, presx)==255) flag++;
-if(origin.at<uchar>(tmpy, presx)==255) flag++;
-if(origin.at<uchar>(tmpy+1, presx)==255) flag++;
-//         std::cout<<"condition: " << cond <<std::endl;
-
-if(flag==0) {
-//          std::cout<<"flag is zero!"<<std::endl;
-} else if(flag==1){
-if(origin.at<uchar>(tmpy-1, presx)==255) {
-presy--;
-cond=1;
-result.at<uchar>(presy,presx)=0;
-} else if(origin.at<uchar>(tmpy+1, presx)==255) {
-presy++;
-cond=-1;
-result.at<uchar>(presy,presx)=0;
-} else if(origin.at<uchar>(tmpy, presx)==255) {
-cond=0;
-result.at<uchar>(presy,presx)=0;
-}
-} else if(flag>2) {
-cond=0;
-} else if(flag==2) {
-if(origin.at<uchar>(tmpy-1, presx)==255) {
-origin.at<uchar>(tmpy-1, presx)==0;
-presy--;
-cond=1;
-} else {
-cond=0;
-}
-if(origin.at<uchar>(tmpy, presx)==255) origin.at<uchar>(tmpy, presx)==0;
-if(origin.at<uchar>(tmpy+1, presx)==255) origin.at<uchar>(tmpy+1, presx)==0;
-}
-} else if(cond==0) {
-if(origin.at<uchar>(tmpy-1, presx)==255) flag++;
-if(origin.at<uchar>(tmpy, presx)==255) flag++;
-if(origin.at<uchar>(tmpy+1, presx)==255) flag++;
-//         std::cout<<"condition: " << cond <<std::endl;
-//         std::cout<<"flag: " << flag <<std::endl;
-if(flag==0) {
-//           std::cout<<"flag is zero!"<<std::endl;
-} else if(flag==1) {
-if(origin.at<uchar>(tmpy-1, presx)==255) {
-presy--;
-cond=1;
-result.at<uchar>(presy,presx)=0;
-} else if(origin.at<uchar>(tmpy+1, presx)==255) {
-presy++;
-cond=-1;
-result.at<uchar>(presy,presx)=0;
-} else if(origin.at<uchar>(tmpy, presx)==255) {
-cond=0;
-result.at<uchar>(presy,presx)=0;
-}
-} else if(flag>2) {
-cond=0;
-} else if(flag==2) {
-if(origin.at<uchar>(tmpy-1, presx)==255) {
-origin.at<uchar>(tmpy-1, presx)==0;
-presy--;
-cond=1;
-} else {
-cond=0;
-}
-if(origin.at<uchar>(tmpy, presx)==255) origin.at<uchar>(tmpy, presx)==0;
-if(origin.at<uchar>(tmpy+1, presx)==255) origin.at<uchar>(tmpy+1, presx)==0;
-}
-} else if(cond==-1) {
-if(origin.at<uchar>(tmpy-1, presx)==255) flag++;
-if(origin.at<uchar>(tmpy, presx)==255) flag++;
-if(origin.at<uchar>(tmpy+1, presx)==255) flag++;
-//         std::cout<<"condition: " << cond <<std::endl;
-
-if(flag==0) {
-//           std::cout<<"flag is zero!"<<std::endl;
-} else if(flag==1) {
-if(origin.at<uchar>(tmpy-1, presx)==255) {
-presy--;
-cond=1;
-result.at<uchar>(presy,presx)=0;
-} else if(origin.at<uchar>(tmpy+1, presx)==255) {
-presy++;
-cond=-1;
-result.at<uchar>(presy,presx)=0;
-} else if(origin.at<uchar>(tmpy, presx)==255) {
-cond=0;
-result.at<uchar>(presy,presx)=0;
-}
-} else if(flag>2) {
-cond=0;
-} else if(flag==2) {
-if(origin.at<uchar>(tmpy-1, presx)==255) {
-origin.at<uchar>(tmpy-1, presx)==0;
-presy--;
-cond=1;
-} else {
-cond=0;
-}
-if(origin.at<uchar>(tmpy, presx)==255) origin.at<uchar>(tmpy, presx)==0;
-if(origin.at<uchar>(tmpy+1, presx)==255) origin.at<uchar>(tmpy+1, presx)==0;
-}
-}
-}
-
-return result;
-}*/
 
 cv::Mat rmNoise(cv::Mat origin) {
 	cv::Mat result(50, 198, CV_8U);
@@ -322,41 +139,9 @@ cv::Mat rmNoise(cv::Mat origin) {
 	}
 	return result;
 }
-/*
-cv::Mat removeNoise(cv::Mat origin) {
-cv::Mat result(50,198,CV_8U);
-for(int i = 0; i<198; i++) {
-for(int j = 0; j<50; j++) {
-result.at<uchar>(j, i)=origin.at<uchar>(j, i);
-}
-}
-for(int i = 1; i<197; i++) {
-for(int j = 1; j<49; j++) {
-if(origin.at<uchar>(j, i)==255) {
-if(origin.at<uchar>(j-1, i)==0 || origin.at<uchar>(j+1, i)==0 || (origin.at<uchar>(j, i+1)==0 && origin.at<uchar>(j, i-1)) ) {
-result.at<uchar>(j,i)=0;
-} else {
-result.at<uchar>(j,i)=255;
-}
-}
-}
-}
-for(int i = 1; i<197; i++) {
-for(int j = 1; j<49; j++) {
-if(result.at<uchar>(j, i)==255) {
-if(result.at<uchar>(j-1, i)==0 &&result.at<uchar>(j+1, i)==0 && (result.at<uchar>(j, i+1)==0 && result.at<uchar>(j, i-1)) ) {
-result.at<uchar>(j,i)=0;
-} else {
-result.at<uchar>(j,i)=255;
-}
-}
-}
-}
-return result;
-}
-*/
-void readFirst() {
-   std::string dirName = "/home/seongmo/다운로드/git/1st/";
+
+void readAnswerSet() {
+   std::string dirName = "/home/seongmo/다운로드/git/Answerset/";
 	DIR *dir;
 	dir = opendir(dirName.c_str());
 	std::string imgName;
@@ -370,7 +155,7 @@ void readFirst() {
 			if (imgName == "." || imgName == "..") continue;
 			std::string fullPath(dirName + imgName);
 			std::cout << fullPath << std::endl;
-			first[cnt] = cv::imread(fullPath, 0);
+			answer[cnt] = cv::imread(fullPath, 0);
 			cnt++;
 		}
 		closedir(dir);
@@ -383,254 +168,21 @@ void readFirst() {
 
 }
 
-void readSecond() {
-   std::string dirName = "/home/seongmo/다운로드/git/2nd/";
-	DIR *dir;
-	dir = opendir(dirName.c_str());
-	std::string imgName;
-	fileIdx = 0;
-	cv::Mat image;
-	int cnt = 0;
-	struct dirent *ent;
-	if (dir != NULL) {
-		while ((ent = readdir(dir)) != NULL) {
-			imgName = ent->d_name;
-			if (imgName == "." || imgName == "..") continue;
-			std::string fullPath(dirName + imgName);
-			std::cout << fullPath << std::endl;
-			second[cnt] = cv::imread(fullPath, 0);
-			cnt++;
-		}
-		closedir(dir);
-	}
-	else {
-		std::cout << "Error!" << std::endl;
-	}
-	if (!image.data)
-		return ;
 
-}
-
-void readThird() {
-   std::string dirName = "/home/seongmo/다운로드/git/3rd/";
-	DIR *dir;
-	dir = opendir(dirName.c_str());
-	std::string imgName;
-	fileIdx = 0;
-	cv::Mat image;
-	int cnt = 0;
-	struct dirent *ent;
-	if (dir != NULL) {
-		while ((ent = readdir(dir)) != NULL) {
-			imgName = ent->d_name;
-			if (imgName == "." || imgName == "..") continue;
-			std::string fullPath(dirName + imgName);
-			std::cout << fullPath << std::endl;
-			third[cnt] = cv::imread(fullPath, 0);
-			cnt++;
-		}
-		closedir(dir);
-	}
-	else {
-		std::cout << "Error!" << std::endl;
-	}
-	if (!image.data)
-		return ;
-
-}
-
-char compareImgThird(cv::Mat croppedImg) {
-   int cols = croppedImg.cols;
-   int rows = croppedImg.rows;
-   int cnt=0;
-   float max=0;
-   int maxIdx=100;
-   int pixel[28];
-   char result='A';
-   for(int i=0; i<24; i++) {
-      pixel[i]=calcPixel(third[i], third[i].cols, third[i].rows);
-      for(int j=0; j<cols; j++) {
-         for(int k=0; k<rows; k++) {
-            if(third[i].at<uchar>(k, j)==255) {
-               if(croppedImg.at<uchar>(k, j)==255) {
-                  cnt++;
-               }
-               else {
-                  cnt--;
-               }
-            }
-            if(croppedImg.at<uchar>(k, j)==0) {
-               if(third[i].at<uchar>(k, j)==255) {
-                  cnt--;
-               }
-            }
-         }
-      }
- //     std::cout<<"index: "<<i <<" percent: "<<((float)cnt)/(cols*rows)<<std::endl;
-      if(max<((float)cnt)/(cols*rows) ) {
-         max=((float)cnt)/(cols*rows);
-         maxIdx=i;
-      }
-      cnt=0;
-   }
-   std::cout<<"MaxIdx3: "<<maxIdx<<std::endl;
-   cv::imshow("answer3", third[maxIdx]);
-   
-   switch(maxIdx) {
-      case 0: result='G';
-      break;
-      case 1: result='J';
-      break;
-      case 2: result='D';
-      break;
-      case 3: result='Y';
-      break;
-      case 4: result='K';
-      break;
-      case 5: result='T';
-      break;
-      case 6: result='S';
-      break;
-      case 7: result='Z';
-      break;
-      case 8: result='O';
-      break;
-      case 9: result='L';
-      break;
-      case 10: result='X';
-      break;
-      case 11: result='M';
-      break;
-      case 12: result='C';
-      break;
-      case 13: result='V';
-      break;
-      case 14: result='B';
-      break;
-      case 15: result='U';
-      break;
-      case 16: result='I';
-      break;
-      case 17: result='E';
-      break;
-      case 18: result='W';
-      break;
-      case 19: result='P';
-      break;
-      case 20: result='N';
-      break;
-      case 21: result='F';
-      break;
-      case 22: result='H';
-      break;
-      case 23: result='R';
-      break;
-   }
-   return result;
-}
-
-char compareImgSecond(cv::Mat croppedImg) {
-   int cols = croppedImg.cols;
-   int rows = croppedImg.rows;
-   int cnt=0;
-   float max=0;
-   int maxIdx=100;
-   int pixel[28];
-   char result='A';
-   for(int i=0; i<24; i++) {
-      pixel[i]=calcPixel(second[i], second[i].cols, second[i].rows);
-      for(int j=0; j<cols; j++) {
-         for(int k=0; k<rows; k++) {
-            if(second[i].at<uchar>(k, j)==255) {
-               if(croppedImg.at<uchar>(k, j)==255) {
-                  cnt++;
-               }
-               else {
-                  cnt--;
-               }
-            }
-            if(croppedImg.at<uchar>(k, j)==0) {
-               if(second[i].at<uchar>(k, j)==255) {
-                  cnt--;
-               }
-            }
-         }
-      }
- //     std::cout<<"index: "<<i <<" percent: "<<((float)cnt)/(cols*rows)<<std::endl;
-      if(max<((float)cnt)/(cols*rows) ) {
-         max=((float)cnt)/(cols*rows);
-         maxIdx=i;
-      }
-      cnt=0;
-   }
-   std::cout<<"MaxIdx2: "<<maxIdx<<std::endl;
-   cv::imshow("answer2", second[maxIdx]);
-   
-   switch(maxIdx) {
-      case 0: result='G';
-      break;
-      case 1: result='J';
-      break;
-      case 2: result='D';
-      break;
-      case 3: result='Y';
-      break;
-      case 4: result='K';
-      break;
-      case 5: result='T';
-      break;
-      case 6: result='S';
-      break;
-      case 7: result='Z';
-      break;
-      case 8: result='O';
-      break;
-      case 9: result='L';
-      break;
-      case 10: result='X';
-      break;
-      case 11: result='M';
-      break;
-      case 12: result='C';
-      break;
-      case 13: result='V';
-      break;
-      case 14: result='B';
-      break;
-      case 15: result='U';
-      break;
-      case 16: result='I';
-      break;
-      case 17: result='E';
-      break;
-      case 18: result='W';
-      break;
-      case 19: result='P';
-      break;
-      case 20: result='N';
-      break;
-      case 21: result='F';
-      break;
-      case 22: result='H';
-      break;
-      case 23: result='R';
-      break;
-   }
-   return result;
-}
 char compareImg(cv::Mat croppedImg) {
    int cols = croppedImg.cols;
    int rows = croppedImg.rows;
    int cnt=0;
    float max=0;
    int maxIdx=100;
-   int pixel[28];
+   int pixel[72];
    char result='A';
-   for(int i=0; i<24; i++) {
-      pixel[i]=calcPixel(first[i], first[i].cols, first[i].rows);
+   
+   for(int i=0; i<72; i++) {
+      pixel[i]=calcPixel(answer[i], answer[i].cols, answer[i].rows);
       for(int j=0; j<cols; j++) {
          for(int k=0; k<rows; k++) {
-            if(first[i].at<uchar>(k, j)==255) {
+            if(answer[i].at<uchar>(k, j)==255) {
                if(croppedImg.at<uchar>(k, j)==255) {
                   cnt++;
                }
@@ -639,7 +191,7 @@ char compareImg(cv::Mat croppedImg) {
                }
             }
             if(croppedImg.at<uchar>(k, j)==0) {
-               if(first[i].at<uchar>(k, j)==255) {
+               if(answer[i].at<uchar>(k, j)==255) {
                   cnt--;
                }
             }
@@ -655,53 +207,149 @@ char compareImg(cv::Mat croppedImg) {
 
    
    switch(maxIdx) {
-      case 0: result='G';
+      case 0: result='H';
       break;
-      case 1: result='J';
+      case 1: result='C';
       break;
-      case 2: result='D';
+      case 2: result='J';
       break;
       case 3: result='Y';
       break;
-      case 4: result='K';
+      case 4: result='F';
       break;
-      case 5: result='T';
+      case 5: result='X';
       break;
-      case 6: result='S';
+      case 6: result='G';
       break;
-      case 7: result='Z';
+      case 7: result='O';
       break;
-      case 8: result='O';
+      case 8: result='B';
       break;
-      case 9: result='L';
+      case 9: result='M';
       break;
-      case 10: result='X';
+      case 10: result='S';
       break;
-      case 11: result='M';
+      case 11: result='S';
       break;
-      case 12: result='C';
+      case 12: result='D';
       break;
-      case 13: result='V';
+      case 13: result='N';
       break;
-      case 14: result='B';
+      case 14: result='M';
       break;
-      case 15: result='U';
+      case 15: result='E';
       break;
-      case 16: result='I';
+      case 16: result='R';
       break;
-      case 17: result='E';
+      case 17: result='R';
       break;
-      case 18: result='W';
+      case 18: result='R';
       break;
-      case 19: result='P';
+      case 19: result='W';
       break;
-      case 20: result='N';
+      case 20: result='T';
       break;
-      case 21: result='F';
+      case 21: result='B';
       break;
-      case 22: result='H';
+      case 22: result='T';
       break;
-      case 23: result='R';
+      case 23: result='I';
+      break;
+      case 24: result='O';
+      break;
+      case 25: result='W';
+      break;
+      case 26: result='N';
+      break;
+      case 27: result='I';
+      break;
+      case 28: result='Z';
+      break;
+      case 29: result='F';
+      break;
+      case 30: result='J';
+      break;
+      case 31: result='W';
+      break;
+      case 32: result='L';
+      break;
+      case 33: result='K';
+      break;
+      case 34: result='C';
+      break;
+      case 35: result='G';
+      break;
+      case 36: result='N';
+      break;
+      case 37: result='P';
+      break;
+      case 38: result='Y';
+      break;
+      case 39: result='X';
+      break;
+      case 40: result='Z';
+      break;
+      case 41: result='V';
+      break;
+      case 42: result='L';
+      break;
+      case 43: result='E';
+      break;
+      case 44: result='O';
+      break;
+      case 45: result='T';
+      break;
+      case 46: result='E';
+      break;
+      case 47: result='U';
+      break;
+      case 48: result='B';
+      break;
+      case 49: result='J';
+      break;
+      case 50: result='C';
+      break;
+      case 51: result='V';
+      break;
+      case 52: result='P';
+      break;
+      case 53: result='P';
+      break;
+      case 54: result='X';
+      break;
+      case 55: result='Z';
+      break;
+      case 56: result='M';
+      break;
+      case 57: result='Y';
+      break;
+      case 58: result='V';
+      break;
+      case 59: result='K';
+      break;
+      case 60: result='U';
+      break;
+      case 61: result='H';
+      break;
+      case 62: result='F';
+      break;
+      case 63: result='I';
+      break;
+      case 64: result='G';
+      break;
+      case 65: result='L';
+      break;
+      case 66: result='U';
+      break;
+      case 67: result='D';
+      break;
+      case 68: result='K';
+      break;
+      case 69: result='H';
+      break;
+      case 70: result='S';
+      break;
+      case 71: result='D';
       break;
    }
 
@@ -761,8 +409,10 @@ void readImg(cv::Mat image, std::string imgName) {
 	calcX(newImg);
 	calcY(newImg);
 	
+	for (int i = 0; i<5; i++) {
+		std::cout << windowY[i][0] << " " << windowY[i][1] << std::endl;
+	}
 
-	(newImg);
 
 	cv::imshow("aaaaa", newImg);
 	std::ostringstream filename;
@@ -797,7 +447,7 @@ void readImg(cv::Mat image, std::string imgName) {
 	   result[1]='J';
 	}
 	else {
-	   result[1]=compareImgSecond(croppedImg);
+	   result[1]=compareImg(croppedImg);
 	}
 
 	std::ostringstream filename3;
@@ -814,7 +464,7 @@ void readImg(cv::Mat image, std::string imgName) {
 	   result[2]='J';
 	}
 	else {
-	   result[2]=compareImgThird(croppedImg);
+	   result[2]=compareImg(croppedImg);
 	}
 
 	std::ostringstream filename4;
@@ -831,7 +481,7 @@ void readImg(cv::Mat image, std::string imgName) {
 	   result[3]='J';
 	}
 	else {
-	   //result[3]=compareImg(croppedImg);
+	   result[3]=compareImg(croppedImg);
 	}
 
 	std::ostringstream filename5;
@@ -848,7 +498,7 @@ void readImg(cv::Mat image, std::string imgName) {
 	   result[4]='J';
 	}
 	else {
-	   //result[4]=compareImg(croppedImg);
+	   result[4]=compareImg(croppedImg);
 	}
 
 	cv::waitKey(0);
@@ -867,9 +517,7 @@ int main()
 	cv::Mat image;
 	int cnt = 1;
 	struct dirent *ent;
-	readFirst();
-	readSecond();
-	readThird();
+	readAnswerSet();
 	if (dir != NULL) {
 		while ((ent = readdir(dir)) != NULL) {
 			imgName = ent->d_name;
