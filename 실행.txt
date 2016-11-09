@@ -1,0 +1,25 @@
+폴더
+  AnwswerSet - 정답셋
+  temp - test set
+  test - java 컴파일 결과 클래스 파일
+
+파일
+  Makefile
+  make       - cpp 컴파일 파일
+  out
+  output.txt - cpp result
+  segment.cpp
+
+  test.java   - java 
+  swing.java  - java
+  test.jar    - jar excutabla file
+
+
+java 코드안에 make all 넣어놔서 cpp 컴파일도 같이 되도록 했음.
+java compile 방법
+  1. javac -d . *java     -> test 폴더 생김(안에 class file )
+  2. java -cp . test.test -> java 실행
+
+jar 파일 생성 및 실행
+  Jar -cvmf manifest.txt test.jar test/*.class
+  java -jar test.jar
